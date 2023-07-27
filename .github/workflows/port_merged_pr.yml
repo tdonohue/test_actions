@@ -33,4 +33,4 @@ jobs:
         # Title to add to the port PR
         pull_title: '[Port ${target_branch}] ${pull_title}'
         # Description to add to the port PR
-        pull_description: 'Port of #${pull_number} by @${pull_author} to `${target_branch}`. Fixes ${issue_refs}'
+        pull_description: 'Port of #${pull_number} by @${pull_author} to `${target_branch}`.'
