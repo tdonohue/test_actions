@@ -1,0 +1,36 @@
+# This workflow runs whenever a new pull request is merged
+name: Pull Request merged
+
+# Only run for merged PRs against the "main" or maintenance branches
+# We allow this to run for `pull_request_target` so that github secrets are available
+# (This is required to assign a PR back to the creator when the PR comes from a forked repo)
+on:
+  pull_request_target:
+    types: [ closed ]
+    branches:
+      - main
+      - 'dspace-**'
+
+permissions:
+  contents: write      # so it can comment
+  pull-requests: write # so it can create pull requests
+
+jobs:
+  port_pr:
+    runs-on: ubuntu-latest
+    # Don't run on closed unmerged pull requests
+    if: github.event.pull_request.merged
+    steps:
+    # Checkout code
+    - uses: actions/checkout@v3
+    # Port PR to other branch (if labeled with "port to")
+    # See https://github.com/korthout/backport-action
+    - name: Create backport pull requests
+      uses: korthout/backport-action@v1
+      with:
+        # Trigger based on a "port to [branch]" label on PR
+        label_pattern: '^port to ([^ ]+)$'
+        # Title to add to the port PR
+        pull_title: '[Port ${target_branch}] ${pull_title}'
+        # Description to add to the port PR
+        pull_description: 'Port of #${pull_number} by @${pull_author} to `${target_branch}`. Fixes ${issue_refs}'
